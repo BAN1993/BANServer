@@ -9,16 +9,17 @@ import parseProtocol
 playerList = {}			#k=numid,v=player
 
 def addPlayer(conn,numid):
-	log.logi(sys._getframe(),"numid="+str(numid)+",try to add,conn="+str(conn.getpeername()))
+	log.logi(sys._getframe(),"addPlayer:numid="+str(numid)+",try to add,conn="+str(conn.getpeername()))
 	if playerList.has_key(numid) :
-		log.logw(sys._getframe(),"numid="+str(numid)+",is in list,close it,conn="+str(playerList[numid]))
-		playerList[numid].close()
+		log.logw(sys._getframe(),"addPlayer:numid="+str(numid)+",is in list,close it,conn="+str(playerList[numid]))
+		playerList[numid].close("kick by others")
 		#playerList[numid].getConn().shutdown(2)
 		#playerList[numid].getConn().close()
 		del playerList[numid]
 	pl = player.Player(conn,numid)
 	playerList[numid] = pl
-	log.logi(sys._getframe(),"numid="+str(numid)+",add to list,conn="+str(conn.getpeername()))
+	log.logi(sys._getframe(),"addPlayer:numid="+str(numid)+",add to list,conn="+str(conn.getpeername()))
+	return True
 
 def delPlayer(player):
 	sendPool.delPlayer(player.getConn())
@@ -36,7 +37,7 @@ def delPlayerByConn(conn):
 	player = findPlayerByConn(conn)
 	if player == False:
 		#raise Exception("Can not find player:conn="+str(conn))
-		log.logw(sys._getframe(),"Can not find player:conn="+str(conn))
+		log.logw(sys._getframe(),"delPlayerByConn:Can not find player:conn="+str(conn))
 		return
 	delPlayer(player)
 		

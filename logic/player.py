@@ -19,8 +19,8 @@ class Player:
 		self.m_numid = numid
 		self.m_addr = str(conn.getpeername())
 		
-	def delPlayer(self):
-		self.conn.close()
+#	def delPlayer(self):
+#		self.conn.close()
 		
 	def getConn(self):
 		return self.m_conn
@@ -34,7 +34,7 @@ class Player:
 	def senddata(self, data):
 		sendPool.push(self.m_conn, data)
 		
-	def close(self):
+	def close(self,data):
 		req = parseProtocol.ReqQuit()
-		senddata = req.pack(0)
+		senddata = req.pack(data)
 		self.senddata(senddata)

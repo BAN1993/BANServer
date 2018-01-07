@@ -13,27 +13,24 @@ XYID_PLAYERDATA	= 5
 
 class ReqLogin:
 	numid = 0
-	password = 0
-	len_buf = 0
-	buf = ""
+	len_pas = 0
+	password = ""
 	
 	def make(self,xyid,packlen,data):
 		try:
 			nowindex,self.numid 	= base.getInt(data,0)
-			nowindex,self.password 	= base.getInt(data,nowindex)
-			nowindex,self.len_buf	= base.getInt(data,nowindex)
-			nowindex,self.buf 		= base.getStr(data,nowindex,self.len_buf)
+			nowindex,self.len_pas 	= base.getInt(data,nowindex)
+			nowindex,self.password	= base.getStr(data,nowindex,self.len_pas)
 		except base.protocolException,e:
-			log.loge(sys._getframe(),  "doLogin err,msg="+e.msg )
+			log.loge(sys._getframe(),  "make:doLogin err,msg="+e.msg )
 			return False
 		return True
 		
-	def pack(self,numid,password,buf):
+	def pack(self,numid,password):
 		data	= base.getPackStr("ii",XYID_REQLOGIN,0)
 		data	= data + base.getPackStr("i",numid)
-		data	= data + base.getPackStr("i",password)
-		data	= data + base.getPackStr("i",len(buf))
-		data	= data + base.getPackStr(str(len(buf))+"s",buf)
+		data	= data + base.getPackStr("i",len(password))
+		data	= data + base.getPackStr(str(len(password))+"s",password)
 		return data
 
 class ReqAction:
@@ -47,24 +44,27 @@ class ReqAction:
 			nowindex,self.len_buf	= base.getInt(data,nowindex)
 			nowindex,self.buf		= base.getStr(data,nowindex,self.len_buf)
 		except base.protocolException,e:
-			log.loge(sys._getframe(),  "doAction err,msg="+e.msg)
+			log.loge(sys._getframe(),  "makedoAction err,msg="+e.msg)
 			return False
 		return True
 
 class ReqQuit:
-	num = 0
+	msg_len = 0
+	msg = ""
 	
 	def make(self,xyid,packlen,data):
 		try:
-			nowindex,self.num	= base.getInt(data,0)
+			nowindex,self.msg_len	= base.getInt(data,0)
+			nowindex,self.msg		= base,getStr(data,nowindex,self.msg_len)
 		except base.protocolException,e:
-			log.loge(sys._getframe(),  "doQuit err,msg="+e.msg)
+			log.loge(sys._getframe(),  "makedoQuit err,msg="+e.msg)
 			return False
 		return True
 	
-	def pack(self,num):
+	def pack(self,msg):
 		data	= base.getPackStr("ii",XYID_REQQUIT,0)
-		data	= data + base.getPackStr("i",num)
+		data	= data + base.getPackStr("i",len(msg))
+		data	= data + base.getPackStr(str(len(msg))+"s",msg)
 		return data
 
 class ReqDefault:
@@ -74,7 +74,7 @@ class ReqDefault:
 		try:
 			nowindex,self.num	= base.getInt(data,0)
 		except base.protocolException,e:
-			log.loge(sys._getframe(),  "doDefault err,msg="+e.msg)
+			log.loge(sys._getframe(),  "makedoDefault err,msg="+e.msg)
 			return False
 		return True
 		

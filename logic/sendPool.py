@@ -26,7 +26,7 @@ def getOutPuts():
 	return msgOutPuts
 	
 def getMsg(conn):
-	log.logd(sys._getframe(),"addr="+str(conn.getpeername()))
+	log.logd(sys._getframe(),"getMsg:addr="+str(conn.getpeername()))
 	try:
 		return msgQueus[conn].get_nowait()
 	except:
