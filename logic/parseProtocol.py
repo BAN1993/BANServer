@@ -1,7 +1,6 @@
-import sys
+import logging
 
 import base
-import log
 
 HANLEN = 8
 
@@ -22,7 +21,7 @@ class ReqLogin:
 			nowindex,self.len_pas 	= base.getInt(data,nowindex)
 			nowindex,self.password	= base.getStr(data,nowindex,self.len_pas)
 		except base.protocolException,e:
-			log.loge(sys._getframe(),  "make:doLogin err,msg="+e.msg )
+			logging.error(  "make:doLogin err,msg="+e.msg )
 			return False
 		return True
 		
@@ -44,7 +43,7 @@ class ReqAction:
 			nowindex,self.len_buf	= base.getInt(data,nowindex)
 			nowindex,self.buf		= base.getStr(data,nowindex,self.len_buf)
 		except base.protocolException,e:
-			log.loge(sys._getframe(),  "makedoAction err,msg="+e.msg)
+			logging.error(  "makedoAction err,msg="+e.msg)
 			return False
 		return True
 
@@ -57,7 +56,7 @@ class ReqQuit:
 			nowindex,self.msg_len	= base.getInt(data,0)
 			nowindex,self.msg		= base,getStr(data,nowindex,self.msg_len)
 		except base.protocolException,e:
-			log.loge(sys._getframe(),  "makedoQuit err,msg="+e.msg)
+			logging.error(  "makedoQuit err,msg="+e.msg)
 			return False
 		return True
 	
@@ -74,7 +73,7 @@ class ReqDefault:
 		try:
 			nowindex,self.num	= base.getInt(data,0)
 		except base.protocolException,e:
-			log.loge(sys._getframe(),  "makedoDefault err,msg="+e.msg)
+			logging.error(  "makedoDefault err,msg="+e.msg)
 			return False
 		return True
 		

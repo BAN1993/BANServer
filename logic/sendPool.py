@@ -1,7 +1,6 @@
-import sys
 import Queue
+import logging
 
-import log
 import player
 import playerManager
 
@@ -26,7 +25,7 @@ def getOutPuts():
 	return msgOutPuts
 	
 def getMsg(conn):
-	log.logd(sys._getframe(),"getMsg:addr="+str(conn.getpeername()))
+	logging.debug("getMsg:addr="+str(conn.getpeername()))
 	try:
 		return msgQueus[conn].get_nowait()
 	except:

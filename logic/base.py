@@ -1,4 +1,3 @@
-#-*- coding:utf-8 ¨C*-
 import struct
 
 LEN_INT = 4
@@ -12,7 +11,7 @@ def getBytes(data):
 
 def getBytesIndex(data,begin,strlen):
 	if len(data)<begin+strlen:
-		log.loge(sys._getframe(),  "data len<"+str(begin+strlen))
+		log.loge(  "data len<"+str(begin+strlen))
 		return ""
 	return ' '.join(['0x%x' % ord(data[x]) for x in range(begin,begin+strlen)])
 

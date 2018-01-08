@@ -4,6 +4,7 @@ import sys
 import socket
 import traceback
 #from thread import *
+import logging
 
 sys
 sys.path.append("logic")
@@ -15,18 +16,19 @@ PORT = 8300
 
 if __name__ == '__main__':
 
-	log.logi(sys._getframe(),"server start!")
+	log.initLog("BANServer")
+	logging.info("server start!")
 	
 	try:
 		svr = server.Server(HOST,PORT)
 	except socket.error, msg:
-		log.loge(sys._getframe(), 'Bind failed,Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
+		logging.error( 'Bind failed,Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
 	
 	try:
 		svr.run()
 	except BaseException as e:
-		log.logexc(e)
+		logging.exception(e)
 	else:
-		log.loge("Crash Unknown!")
+		logging.error("Crash Unknown!")
     
 

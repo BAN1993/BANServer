@@ -1,8 +1,7 @@
-import sys
+import logging
 
 import parseProtocol
 import sendPool
-import log
 
 class Player:
 	
