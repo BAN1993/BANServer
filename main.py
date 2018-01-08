@@ -22,7 +22,7 @@ if __name__ == '__main__':
 	try:
 		svr = server.Server(HOST,PORT)
 	except socket.error, msg:
-		logging.error( 'Bind failed,Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
+		logging.error('Bind failed,Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
 	
 	try:
 		svr.run()

@@ -40,7 +40,7 @@ class Server(object):
 			server_host = (self.m_host, self.m_port)
 			self.m_server.bind(server_host)
 			self.m_server.listen(self.m_lisenNum)
-			logging.info("__init__:bind success:host="+str(server_host))
+			logging.info("bind success:host="+str(server_host))
 		except :
 			raise
 		self.m_inputs = [self.m_server]
@@ -55,7 +55,7 @@ class Server(object):
 			for s in readtable:
 				if s is self.m_server:
 					conn, addr = s.accept()
-					logging.info("run:accept="+str(addr))
+					logging.info("accept:"+str(conn)+",addr="+str(addr))
 					conn.setblocking(0)
 					self.m_inputs.append(conn)
 					self.m_clientList[conn]=str(addr)
@@ -63,18 +63,18 @@ class Server(object):
 					data = ""
 					try:
 						data = s.recv(self.m_maxBufLen)
-						#logging.debug( "recv data="+base.getBytes(data))
+						#logging.debug("recv data="+base.getBytes(data))
 					except socket.error, msg:
-						logging.error( 'run:Recv Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
+						logging.error('Recv Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
 					if data:
 						ret,xyid,packlen = base.getHand(data)
 						if ret == True:
-							logging.debug( "run:len="+str(packlen)+",by="+base.getBytes(data[0:packlen]))
+							logging.debug("len="+str(packlen)+",by="+base.getBytes(data[0:packlen]))
 							selectProtocol.getXY(s,xyid,packlen,data[0:packlen])
 						#else:
-							#logging.error( "can not getHand,data="+base.getBytes(data))
+							#logging.error("can not getHand,data="+base.getBytes(data))
 					else:
-						logging.info( "run:client colse:"+str(self.m_clientList[s]))
+						logging.info("client colse:"+str(s)+",addr="+str(self.m_clientList[s]))
 						if s in self.m_inputs:
 							self.m_inputs.remove(s)
 						s.close()
@@ -84,25 +84,25 @@ class Server(object):
 			## for s in readtable:
 			
 			for s in writable:
-				#logging.debug( "get send msg:conn="+self.m_clientList[s]+",nowsize="+str(self.m_msgQueus[s].qsize()))
+				#logging.debug("get send msg:conn="+self.m_clientList[s]+",nowsize="+str(self.m_msgQueus[s].qsize()))
 				try:
 					next_msg = sendPool.getMsg(s)
 				except Queue.Empty:
-					logging.debug( "run:Output Queue is Empty!conn="+self.m_clientList[s])
+					logging.debug("Output Queue is Empty!conn="+self.m_clientList[s])
 					#self.m_outputs.remove(s)
 				except Exception, e:
-					logging.error( "run:Send Data Error! ErrMsg:%s" % str(e))
+					logging.error("Send Data Error! ErrMsg:%s" % str(e))
 				else:
 					try:
 						s.sendall(next_msg)
-						logging.debug("run:send data:addr=%s,databytes=%s" % (str(s.getpeername()),base.getBytes(next_msg)))
+						logging.debug("send data:addr=%s,databytes=%s" % (str(s.getpeername()),base.getBytes(next_msg)))
 					except Exception, e:
-						logging.error( "run:Send Data to %s  Error And Close! ErrMsg:%s" % (str(s.getpeername()), str(e)))
+						logging.error("Send Data to %s  Error And Close! ErrMsg:%s" % (str(s.getpeername()), str(e)))
 						playerManager.delPlayerByConn(s)
 			## for s in writable:
 			
 			for s in exceptional:
-				logging.error( "run:Client:%s Close Error." % str(self.m_clientList[cli]))
+				logging.error("Client:%s Close Error." % str(self.m_clientList[cli]))
 				if s in self.m_inputs:
 					self.m_inputs.remove(s)
 					s.close()

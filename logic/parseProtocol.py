@@ -21,7 +21,7 @@ class ReqLogin:
 			nowindex,self.len_pas 	= base.getInt(data,nowindex)
 			nowindex,self.password	= base.getStr(data,nowindex,self.len_pas)
 		except base.protocolException,e:
-			logging.error(  "make:doLogin err,msg="+e.msg )
+			logging.error("doLogin err,msg="+e.msg )
 			return False
 		return True
 		
@@ -43,7 +43,7 @@ class ReqAction:
 			nowindex,self.len_buf	= base.getInt(data,nowindex)
 			nowindex,self.buf		= base.getStr(data,nowindex,self.len_buf)
 		except base.protocolException,e:
-			logging.error(  "makedoAction err,msg="+e.msg)
+			logging.error("doAction err,msg="+e.msg)
 			return False
 		return True
 
@@ -56,7 +56,7 @@ class ReqQuit:
 			nowindex,self.msg_len	= base.getInt(data,0)
 			nowindex,self.msg		= base,getStr(data,nowindex,self.msg_len)
 		except base.protocolException,e:
-			logging.error(  "makedoQuit err,msg="+e.msg)
+			logging.error("doQuit err,msg="+e.msg)
 			return False
 		return True
 	
@@ -73,7 +73,7 @@ class ReqDefault:
 		try:
 			nowindex,self.num	= base.getInt(data,0)
 		except base.protocolException,e:
-			logging.error(  "makedoDefault err,msg="+e.msg)
+			logging.error("doDefault err,msg="+e.msg)
 			return False
 		return True
 		
