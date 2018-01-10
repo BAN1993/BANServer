@@ -63,7 +63,7 @@ class Server(object):
 					data = ""
 					try:
 						data = s.recv(self.m_maxBufLen)
-						#logging.debug("recv data="+base.getBytes(data))
+						logging.debug("recv data="+base.getBytes(data))
 					except socket.error, msg:
 						logging.error('Recv Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
 					if data:

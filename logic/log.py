@@ -16,4 +16,4 @@ def initLog(fname):
 	#	filename=('log/%s_%s.log' % (fname,time.strftime("%Y%m%d-%H%M%S",time.localtime()))),
 	#	filemode='w')
 	
-	logging.config.fileConfig("logging.conf")
+	logging.config.fileConfig(fname)

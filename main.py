@@ -8,6 +8,7 @@ import logging
 
 sys
 sys.path.append("logic")
+import deamon
 import server
 import log
 
@@ -16,8 +17,9 @@ PORT = 8300
 
 if __name__ == '__main__':
 
-	log.initLog("BANServer")
-	logging.info("server start!")
+	deamon.daemonize()
+	log.initLog("logging.conf")
+	logging.info("server start!!!")
 	
 	try:
 		svr = server.Server(HOST,PORT)
