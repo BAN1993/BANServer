@@ -1,38 +1,46 @@
 #coding: utf-8
 import sys
 import os
+import platform
+import logging
 
 def daemonize (stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
-     #ÖØ¶¨Ïò±ê×¼ÎÄ¼şÃèÊö·û£¨Ä¬ÈÏÇé¿öÏÂ¶¨Ïòµ½/dev/null£©
-    try: 
-        pid = os.fork() 
-          #¸¸½ø³Ì(»á»°×éÍ·Áì½ø³Ì)ÍË³ö£¬ÕâÒâÎ¶×ÅÒ»¸ö·Ç»á»°×éÍ·Áì½ø³ÌÓÀÔ¶²»ÄÜÖØĞÂ»ñµÃ¿ØÖÆÖÕ¶Ë¡£
+     #é‡å®šå‘æ ‡å‡†æ–‡ä»¶æè¿°ç¬¦ï¼ˆé»˜è®¤æƒ…å†µä¸‹å®šå‘åˆ°/dev/nullï¼‰
+
+    sysstr = platform.system()
+    if sysstr != "Linux" :
+        logging.warn("can not deamonize,platform="+sysstr)
+        return
+
+    try:
+        pid = os.fork()
+          #çˆ¶è¿›ç¨‹(ä¼šè¯ç»„å¤´é¢†è¿›ç¨‹)é€€å‡ºï¼Œè¿™æ„å‘³ç€ä¸€ä¸ªéä¼šè¯ç»„å¤´é¢†è¿›ç¨‹æ°¸è¿œä¸èƒ½é‡æ–°è·å¾—æ§åˆ¶ç»ˆç«¯ã€‚
         if pid > 0:
-            sys.exit(0)   #¸¸½ø³ÌÍË³ö
-    except OSError, e: 
+            sys.exit(0)   #çˆ¶è¿›ç¨‹é€€å‡º
+    except OSError, e:
         sys.stderr.write ("fork #1 failed: (%d) %s\n" % (e.errno, e.strerror) )
         sys.exit(1)
 
-     #´ÓÄ¸Ìå»·¾³ÍÑÀë
-    os.chdir("./")  #chdirÈ·ÈÏ½ø³Ì²»±£³ÖÈÎºÎÄ¿Â¼ÓÚÊ¹ÓÃ×´Ì¬£¬·ñÔò²»ÄÜumountÒ»¸öÎÄ¼şÏµÍ³¡£Ò²¿ÉÒÔ¸Ä±äµ½¶ÔÓÚÊØ»¤³ÌĞòÔËĞĞÖØÒªµÄÎÄ¼şËùÔÚÄ¿Â¼
-    os.umask(0)    #µ÷ÓÃumask(0)ÒÔ±ãÓµÓĞ¶ÔÓÚĞ´µÄÈÎºÎ¶«Î÷µÄÍêÈ«¿ØÖÆ£¬ÒòÎªÓĞÊ±²»ÖªµÀ¼Ì³ĞÁËÊ²Ã´ÑùµÄumask¡£
-    os.setsid()    #setsidµ÷ÓÃ³É¹¦ºó£¬½ø³Ì³ÉÎªĞÂµÄ»á»°×é³¤ºÍĞÂµÄ½ø³Ì×é³¤£¬²¢ÓëÔ­À´µÄµÇÂ¼»á»°ºÍ½ø³Ì×éÍÑÀë¡£
+     #ä»æ¯ä½“ç¯å¢ƒè„±ç¦»
+    os.chdir("./")  #chdirç¡®è®¤è¿›ç¨‹ä¸ä¿æŒä»»ä½•ç›®å½•äºä½¿ç”¨çŠ¶æ€ï¼Œå¦åˆ™ä¸èƒ½umountä¸€ä¸ªæ–‡ä»¶ç³»ç»Ÿã€‚ä¹Ÿå¯ä»¥æ”¹å˜åˆ°å¯¹äºå®ˆæŠ¤ç¨‹åºè¿è¡Œé‡è¦çš„æ–‡ä»¶æ‰€åœ¨ç›®å½•
+    os.umask(0)    #è°ƒç”¨umask(0)ä»¥ä¾¿æ‹¥æœ‰å¯¹äºå†™çš„ä»»ä½•ä¸œè¥¿çš„å®Œå…¨æ§åˆ¶ï¼Œå› ä¸ºæœ‰æ—¶ä¸çŸ¥é“ç»§æ‰¿äº†ä»€ä¹ˆæ ·çš„umaskã€‚
+    os.setsid()    #setsidè°ƒç”¨æˆåŠŸåï¼Œè¿›ç¨‹æˆä¸ºæ–°çš„ä¼šè¯ç»„é•¿å’Œæ–°çš„è¿›ç¨‹ç»„é•¿ï¼Œå¹¶ä¸åŸæ¥çš„ç™»å½•ä¼šè¯å’Œè¿›ç¨‹ç»„è„±ç¦»ã€‚
 
-     #Ö´ĞĞµÚ¶ş´Îfork
-    try: 
-        pid = os.fork() 
+     #æ‰§è¡Œç¬¬äºŒæ¬¡fork
+    try:
+        pid = os.fork()
         if pid > 0:
-            sys.exit(0)   #µÚ¶ş¸ö¸¸½ø³ÌÍË³ö
-    except OSError, e: 
+            sys.exit(0)   #ç¬¬äºŒä¸ªçˆ¶è¿›ç¨‹é€€å‡º
+    except OSError, e:
         sys.stderr.write ("fork #2 failed: (%d) %s\n" % (e.errno, e.strerror) )
         sys.exit(1)
 
-     #½ø³ÌÒÑ¾­ÊÇÊØ»¤½ø³ÌÁË£¬ÖØ¶¨Ïò±ê×¼ÎÄ¼şÃèÊö·û
+     #è¿›ç¨‹å·²ç»æ˜¯å®ˆæŠ¤è¿›ç¨‹äº†ï¼Œé‡å®šå‘æ ‡å‡†æ–‡ä»¶æè¿°ç¬¦
 
     for f in sys.stdout, sys.stderr: f.flush()
     #si = open(stdin, 'r')
     #so = open(stdout, 'a+')
     #se = open(stderr, 'a+', 0)
-    #os.dup2(si.fileno(), sys.stdin.fileno())    #dup2º¯ÊıÔ­×Ó»¯¹Ø±ÕºÍ¸´ÖÆÎÄ¼şÃèÊö·û
+    #os.dup2(si.fileno(), sys.stdin.fileno())    #dup2å‡½æ•°åŸå­åŒ–å…³é—­å’Œå¤åˆ¶æ–‡ä»¶æè¿°ç¬¦
     #os.dup2(so.fileno(), sys.stdout.fileno())
     #os.dup2(se.fileno(), sys.stderr.fileno())
