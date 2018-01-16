@@ -4,11 +4,12 @@ import base
 
 HANLEN = 8
 
-XYID_REQLOGIN	= 1
-XYID_REQACTION	= 2
-XYID_REQQUIT	= 3
-XYID_REQDEFAULT	= 4
-XYID_PLAYERDATA	= 5
+XYID_REQLOGIN		= 1
+XYID_REQACTION		= 2
+XYID_REQQUIT		= 3
+XYID_REQDEFAULT		= 4
+XYID_PLAYERDATA		= 5
+XYID_PLAYERPOSITION = 6
 
 class ReqLogin:
 	numid = 0
@@ -33,14 +34,12 @@ class ReqLogin:
 		return data
 
 class ReqAction:
-	actType = 0
 	len_buf = 0
 	buf = ""
 	
 	def make(self,xyid,packlen,data):
 		try:
-			nowindex,self.actType	= base.getInt(data,0)
-			nowindex,self.len_buf	= base.getInt(data,nowindex)
+			nowindex,self.len_buf	= base.getInt(data,0)
 			nowindex,self.buf		= base.getStr(data,nowindex,self.len_buf)
 		except base.protocolException,e:
 			logging.error("doAction err,msg="+e.msg)
@@ -85,7 +84,27 @@ class ReportPlayerData:
 		data	= data + base.getPackStr("i",numid)
 		return data
 
+class ReqPlayerPosition:
+	x = 0
+	y = 0
+	z = 0
 
+	def make(self, xyid, packlen, data):
+		try:
+			nowindex, self.x= base.getFloat(data, 0)
+			nowindex, self.y= base.getFloat(data, nowindex)
+			nowindex, self.z= base.getFloat(data, nowindex)
+		except base.protocolException, e:
+			logging.error("doQuit err,msg=" + e.msg)
+			return False
+		return True
+
+	def pack(self, numid, x, y, z):
+		data = base.getPackStr("ii", XYID_PLAYERPOSITION, 0)
+		data = data + base.getPackStr("i", len(x))
+		data = data + base.getPackStr("i", len(y))
+		data = data + base.getPackStr("i", len(z))
+		return data
 
 
 

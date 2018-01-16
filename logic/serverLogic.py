@@ -11,10 +11,14 @@ def doLogin(conn,req):
 		player = playerManager.findPlayer(req.numid)
 
 def doAction(req):
-	logging.info("acttype=%d,buf=%s" % (req.actType,req.buf))
+	logging.info("buf=%s" % (req.buf))
 
 def doQuit(req):
 	logging.info("1")
 
 def doDefault(req):
 	logging.info("1")
+
+def doPosition(req):
+	logstr = "x=%f,y=%f,z=%f" % (req.x,req.y,req.z)
+	logging.info(logstr)

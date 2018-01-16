@@ -1,6 +1,7 @@
 import struct
 
 LEN_INT = 4
+LEN_FLOAT = 4
 
 class protocolException(RuntimeError):
     def __init__(self, arg):
@@ -28,6 +29,12 @@ def getInt(data,index):
 		raise protocolException("data len err,datalen="+str(len(data))+",aimlen="+str(index+LEN_INT))
 	(ret,) = struct.unpack('i',data[index:index+LEN_INT])
 	return index+LEN_INT,ret
+
+def getFloat(data,index):
+	if len(data)<index+LEN_FLOAT:
+		raise protocolException("data len err,datalen=" + str(len(data)) + ",aimlen=" + str(index + LEN_FLOAT))
+	(ret,) = struct.unpack('f', data[index:index + LEN_FLOAT])
+	return index + LEN_FLOAT, ret
 
 def getStr(data,index,strlen):
 	if len(data)<index+strlen:
