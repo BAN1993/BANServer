@@ -6,153 +6,210 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Net;
 
-enum HANDTYPE
+namespace SocketClient
 {
-    PACK_TYPE_LOGIN = 1,
-	PACK_TYPE_ACTION,
-	PACK_TYPE_QUIT,
-	PACK_TYPE_DEFAULT,
-    PACK_TYPE_PLAYERDATA,
-}
-
-class ProtocolBase
-{
-    public static byte[] StructToBytes<T>(T structType)
+    enum HANDTYPE
     {
-        int size = Marshal.SizeOf(structType);
-        byte[] bytes = new byte[size];
-        IntPtr structPtr = Marshal.AllocHGlobal(size);
-        Marshal.StructureToPtr(structType, structPtr, false);
-        Marshal.Copy(structPtr, bytes, 0, size);
-        Marshal.FreeHGlobal(structPtr);
-        return bytes;
+        PACK_TYPE = 0,
+        PACK_TYPE_LOGIN,
+        PACK_TYPE_ACTION,
+        PACK_TYPE_QUIT,
+        PACK_TYPE_DEFAULT,
+        PACK_TYPE_PLAYERDATA
     }
 
-    //-------------------------------------------------------------------------------recv byte
-    public static packhand getHand(byte[] buf, ref int nowindex)
+    public class ProtocolBase
     {
-        if (buf.Length < nowindex + 8)
-            throw new Exception("getHand len err");
-        int type = System.BitConverter.ToInt32(buf, 0);
-        //type = IPAddress.NetworkToHostOrder(type);
-        int packlen = System.BitConverter.ToInt32(buf, 4);
-        //packlen = IPAddress.NetworkToHostOrder(packlen);
-        packhand hand = new packhand(type, packlen);
-        nowindex += 8;
-        return hand;
-    }
+        public int type;
+        public int packlen;
 
-    public static int getInt(byte[] buf, ref int nowindex)
-    {
-        if (buf.Length < nowindex + 4)
-            throw new Exception("getInt len err");
-        int num = System.BitConverter.ToInt32(buf, nowindex);
-        nowindex += 4;
-        return num;
-    }
+        private int nowindex;
+        private byte[] buf = new byte[2048];
+        private List<byte> byteSource = new List<byte>();
 
-    public static string getString(byte[] buf, ref int nowindex, int srclen)
-    {
-        if (buf.Length < nowindex + srclen)
-            throw new Exception("getString len err");
-        nowindex += srclen;
-        return System.BitConverter.ToString(buf, nowindex, srclen);
-    }
-
-    //-------------------------------------------------------------------------------create byte
-    public static void replaceHandLen(ref byte[] buf, int nowsize)
-    {
-        byte[] lenBuf = getFromInt(nowsize, ref nowsize);
-        for (int i=4; i<8; i++)
+        public ProtocolBase() 
         {
-            buf[i] = lenBuf[i - 4];
+            this.type = (int)HANDTYPE.PACK_TYPE;
+            this.packlen = 0;
+            this.nowindex = 0;
+        }
+
+        //-------------------------------------------------------------------------------recv byte
+        /// <summary>
+        /// buf >> class
+        /// 解析开始
+        /// </summary>
+        /// <param name="buf"></param>
+        public void makeBegin(byte[] buf)
+        {
+            this.nowindex = 0;
+            this.buf = buf;
+            getHand();
+        }
+
+        /// <summary>
+        /// buf >> class
+        /// 解析协议头
+        /// </summary>
+        private void getHand()
+        {
+            if (this.buf.Length < nowindex + 8)
+                throw new Exception("getHand len err");
+            this.type = System.BitConverter.ToInt32(this.buf, 0);
+            this.packlen = System.BitConverter.ToInt32(this.buf, 4);
+            this.nowindex += 8;
+        }
+
+        /// <summary>
+        /// buf >> class
+        /// 解析Int
+        /// </summary>
+        /// <returns></returns>
+        public int getInt()
+        {
+            if (this.buf.Length < this.nowindex + 4)
+                throw new Exception("getInt len err");
+            int num = System.BitConverter.ToInt32(this.buf, this.nowindex);
+            this.nowindex += 4;
+            return num;
+        }
+
+        /// <summary>
+        /// buf >> class
+        /// 解析string
+        /// </summary>
+        /// <returns></returns>
+        public string getString()
+        {
+            int len = getInt();
+            if (this.buf.Length < this.nowindex + len)
+                throw new Exception("getString len err");
+            this.nowindex += len;
+            return System.BitConverter.ToString(this.buf, nowindex, len);
+        }
+
+        //-------------------------------------------------------------------------------create byte
+        /// <summary>
+        /// class >> buf
+        /// 打包开始
+        /// </summary>
+        public void packBegin()
+        {
+            this.nowindex = 0;
+            this.byteSource.Clear();
+            Array.Clear(buf, 0, buf.Length);
+            packHand();
+        }
+
+        /// <summary>
+        /// class >> buf
+        /// 打包协议头
+        /// </summary>
+        private void packHand()
+        {
+            byteSource.AddRange(getFromInt(this.type));
+            byteSource.AddRange(getFromInt(this.packlen));
+        }
+
+        /// <summary>
+        /// class >> buf
+        /// 打包Int
+        /// </summary>
+        /// <param name="num"></param>
+        public void packInt(int num)
+        {
+            byteSource.AddRange(getFromInt(num));
+        }
+
+        /// <summary>
+        /// class >> buf
+        /// 打包string
+        /// </summary>
+        /// <param name="str"></param>
+        public void packString(string str)
+        {
+            byteSource.AddRange(getFromInt(str.Length));
+            byteSource.AddRange(getFromString(str));
+        }
+
+        /// <summary>
+        /// class >> buf
+        /// 打包结束
+        /// </summary>
+        /// <returns></returns>
+        public byte[] packEnd()
+        {
+            this.buf = this.byteSource.ToArray();
+            replaceHandLen();
+            return this.buf;
+        }
+
+        /// <summary>
+        /// class >> buf
+        /// 替换buf的包大小
+        /// </summary>
+        private void replaceHandLen()
+        {
+            byte[] lenBuf = getFromInt(this.nowindex);
+            for (int i = 4; i < 8; i++)
+            {
+                this.buf[i] = lenBuf[i - 4];
+            }
+        }
+
+        private byte[] getFromInt(int num)
+        {
+            this.nowindex += Marshal.SizeOf(num);
+            return BitConverter.GetBytes(num);
+        }
+
+        private byte[] getFromString(string str)
+        {
+            this.nowindex += str.Length;
+            return System.Text.Encoding.Default.GetBytes(str);
         }
     }
 
-    public static byte[] getFromInt(int num, ref int nowsize)
+    public class pack_login : ProtocolBase
     {
-        nowsize += Marshal.SizeOf(num);
-        return BitConverter.GetBytes(num);
+        public int numid;
+        public string password;
+
+        public pack_login(int numid, string password)
+        {
+            this.type = (int)HANDTYPE.PACK_TYPE_LOGIN;
+            this.numid = numid;
+            this.password = password;
+        }
+
+        public void make(byte[] buf)
+        {
+            makeBegin(buf);
+
+            this.numid = getInt();
+            this.password = getString();
+        }
+
+        public byte[] pack()
+        {
+            packBegin();
+
+            packInt(this.numid);
+            packString(this.password);
+
+            return packEnd();
+        }
     }
 
-    public static byte[] getFromString(string str, ref int nowsize)
+    public class pack_playerdata : ProtocolBase
     {
-        nowsize += str.Length;
-        return System.Text.Encoding.Default.GetBytes(str);
-    }
-}
+        public int numid;
 
-public struct packhand
-{
-    public int type;
-    public int packlen;
+        public void make(byte[] buf)
+        {
+            makeBegin(buf);
 
-    public packhand(int type, int packlen) 
-    {
-        this.type = type; 
-        this.packlen = packlen;
-    }
-
-    public byte[] pack(ref int nowsize)
-    {
-        List<byte> byteSource = new List<byte>();
-        byteSource.AddRange(ProtocolBase.getFromInt(this.type, ref nowsize));
-        byteSource.AddRange(ProtocolBase.getFromInt(this.packlen, ref nowsize));
-        return byteSource.ToArray();
-    }
-}
-
-public struct pack_login
-{
-    public packhand hand;
-    public int numid;
-    public int len_pwd;
-    public string password;
-
-    public pack_login(int numid, string password) 
-    {
-        this.hand = new packhand((int)HANDTYPE.PACK_TYPE_LOGIN, 0); 
-        this.numid = numid; 
-        this.len_pwd = password.Length;
-        this.password = password; 
-    }
-
-    public void make(byte[] buf)
-    {
-        int nowindex = 0;
-
-        this.hand = ProtocolBase.getHand(buf, ref nowindex);
-        this.numid = ProtocolBase.getInt(buf, ref nowindex);
-        this.len_pwd = ProtocolBase.getInt(buf, ref nowindex);
-        this.password = ProtocolBase.getString(buf, ref nowindex, this.len_pwd);
-    }
-
-    public byte[] pack()
-    {
-        int nowsize = 0;
-        List<byte> byteSource = new List<byte>();
-
-        byteSource.AddRange(this.hand.pack(ref nowsize));
-        byteSource.AddRange(ProtocolBase.getFromInt(this.numid, ref nowsize));
-        byteSource.AddRange(ProtocolBase.getFromInt(this.password.Length, ref nowsize));
-        byteSource.AddRange(ProtocolBase.getFromString(this.password, ref nowsize));
-
-        byte[] buf = byteSource.ToArray();
-        ProtocolBase.replaceHandLen(ref buf, nowsize);
-        return buf;
-    }
-}
-
-public struct pack_playerdata
-{
-    public packhand hand;
-    public int numid;
-
-    public void make(byte[] buf)
-    {
-        int nowindex = 0;
-
-        this.hand = ProtocolBase.getHand(buf, ref nowindex);
-        this.numid = ProtocolBase.getInt(buf, ref nowindex);
+            this.numid = getInt();
+        }
     }
 }

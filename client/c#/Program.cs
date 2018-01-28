@@ -13,7 +13,8 @@ namespace SocketClient
         static void Main(string[] args)
         {
             //设定服务器IP地址
-            IPAddress ip = IPAddress.Parse("106.14.144.43");
+            //IPAddress ip = IPAddress.Parse("106.14.144.43");
+            IPAddress ip = IPAddress.Parse("127.0.0.1");
             Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
             {
@@ -39,9 +40,9 @@ namespace SocketClient
             int receiveLength = clientSocket.Receive(result);
             pack_playerdata playerdata = new pack_playerdata();
             playerdata.make(result);
-            Console.WriteLine("收到消息:type=" + playerdata.hand.type + ",len=" + playerdata.hand.packlen + ",numid=" + playerdata.numid);
+            Console.WriteLine("收到消息:type=" + playerdata.type + ",len=" + playerdata.packlen + ",numid=" + playerdata.numid);
 
-            Console.ReadLine();
+            Console.ReadKey();
         }
 
     }
