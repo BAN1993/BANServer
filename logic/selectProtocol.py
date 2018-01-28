@@ -21,17 +21,11 @@ def getXY(conn,xyid,packlen,data):
 		ret = req.make(xyid,packlen,data[8:])
 		if ret == True:
 			serverLogic.doQuit(req)
-
-	elif xyid == parseProtocol.XYID_PLAYERPOSITION:
-		req = parseProtocol.ReqPlayerPosition()
-		ret = req.make(xyid,packlen,data[8:])
-		if ret == True:
-			serverLogic.doPosition(req)
-
+			
 	else:
 		req = parseProtocol.ReqDefault()
 		ret = req.make(xyid,packlen,data[8:])
 		if ret == True:
 			serverLogic.doDefault(req)
-
+	
 

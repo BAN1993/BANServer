@@ -1,18 +1,62 @@
 import struct
+import logging
 
 LEN_INT = 4
-LEN_FLOAT = 4
 
 class protocolException(RuntimeError):
-    def __init__(self, arg):
-        self.msg = arg
+	def __init__(self, arg):
+		self.msg = arg
+
+class protocolBase(object):
+	bs_nowindex = 0
+	bs_buf = ""
+
+	def __init__(self):
+		self.bs_nowindex = 0;
+		self.bs_buf = ""
+
+	#------------------------------------------------------------------------------------------------------------------------
+	def makeBegin(self,buf):
+		self.bs_nowindex = 0
+		self.bs_buf = buf
+
+	def getInt(self):
+		if len(self.bs_buf) < self.bs_nowindex + LEN_INT:
+			raise protocolException("data len err,datalen=" + str(len(self.bs_buf)) + ",aimlen=" + str(self.bs_nowindex + LEN_INT))
+		(ret,) = struct.unpack('i', self.bs_buf[self.bs_nowindex : self.bs_nowindex + LEN_INT])
+		self.bs_nowindex += LEN_INT
+		return ret
+
+	def getStr(self):
+		strlen = self.getInt()
+		if len(self.bs_buf) < self.bs_nowindex + strlen:
+			raise protocolException("data len err,datalen=" + str(len(self.bs_buf)) + ",aimlen=" + str(self.bs_nowindex + strlen))
+		(ret,) = struct.unpack(str(strlen) + "s", self.bs_buf[self.bs_nowindex : self.bs_nowindex + strlen])
+		self.bs_nowindex += strlen
+		return ret
+
+	# ------------------------------------------------------------------------------------------------------------------------
+	def packBegin(self,xyid):
+		self.bs_nowindex = 0
+		self.bs_buf = struct.pack("ii", xyid, 0)
+
+	def packInt(self,num):
+		self.bs_buf = self.bs_buf + struct.pack("i", num)
+
+	def packStr(self,str):
+		strlen = len(str)
+		self.bs_buf = self.bs_buf + struct.pack("i"+str(strlen)+"s",strlen,str)
+
+	def packEnd(self):
+		return self.bs_buf
+
 
 def getBytes(data):
 	return ' '.join(['0x%x' % ord(x) for x in data])
 
 def getBytesIndex(data,begin,strlen):
 	if len(data)<begin+strlen:
-		log.loge("data len<"+str(begin+strlen))
+		logging.error("data len<"+str(begin+strlen))
 		return ""
 	return ' '.join(['0x%x' % ord(data[x]) for x in range(begin,begin+strlen)])
 
@@ -23,27 +67,5 @@ def getHand(data):
 	if xyid <= 0 or packlen <=0:
 		return False,xyid,packlen
 	return True,xyid,packlen
-	
-def getInt(data,index):
-	if len(data)<index+LEN_INT:
-		raise protocolException("getInt:data len err,datalen="+str(len(data))+",aimlen="+str(index+LEN_INT))
-	(ret,) = struct.unpack('i',data[index:index+LEN_INT])
-	return index+LEN_INT,ret
-
-def getFloat(data,index):
-	if len(data)<index+LEN_FLOAT:
-		raise protocolException("getFloat:data len err,datalen=" + str(len(data)) + ",aimlen=" + str(index + LEN_FLOAT))
-	(ret,) = struct.unpack('f', data[index:index + LEN_FLOAT])
-	return index + LEN_FLOAT, ret
-
-def getStr(data,index,strlen):
-	if len(data)<index+strlen:
-		raise protocolException("getStr:data len err,datalen="+str(len(data))+",aimlen="+str(index+strlen))
-	(ret,) = struct.unpack(str(strlen)+"s",data[index:index+strlen])
-	return index+strlen,ret
-
-def getPackStr(cmd,*args):
-	return struct.pack(cmd,*args)
-
 
 

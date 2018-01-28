@@ -4,107 +4,84 @@ import base
 
 HANLEN = 8
 
-XYID_REQLOGIN		= 1
-XYID_REQACTION		= 2
-XYID_REQQUIT		= 3
-XYID_REQDEFAULT		= 4
-XYID_PLAYERDATA		= 5
-XYID_PLAYERPOSITION = 6
+XYID_REQLOGIN	= 1
+XYID_REQACTION	= 2
+XYID_REQQUIT	= 3
+XYID_REQDEFAULT	= 4
+XYID_PLAYERDATA	= 5
 
-class ReqLogin:
+class ReqLogin(base.protocolBase):
 	numid = 0
-	len_pas = 0
 	password = ""
 	
 	def make(self,xyid,packlen,data):
 		try:
-			nowindex,self.numid 	= base.getInt(data,0)
-			nowindex,self.len_pas 	= base.getInt(data,nowindex)
-			nowindex,self.password	= base.getStr(data,nowindex,self.len_pas)
+			self.makeBegin(data)
+			self.numid = self.getInt()
+			self.password = self.getStr()
 		except base.protocolException,e:
 			logging.error("doLogin err,msg="+e.msg )
 			return False
 		return True
 		
 	def pack(self,numid,password):
-		data	= base.getPackStr("ii",XYID_REQLOGIN,0)
-		data	= data + base.getPackStr("i",numid)
-		data	= data + base.getPackStr("i",len(password))
-		data	= data + base.getPackStr(str(len(password))+"s",password)
-		return data
+		self.packBegin(XYID_REQLOGIN)
+		self.packInt(numid)
+		self.packStr(password)
+		return self.packEnd()
 
-class ReqAction:
-	len_buf = 0
+class ReqAction(base.protocolBase):
+	actType = 0
 	buf = ""
 	
 	def make(self,xyid,packlen,data):
 		try:
-			nowindex,self.len_buf	= base.getInt(data,0)
-			nowindex,self.buf		= base.getStr(data,nowindex,self.len_buf)
+			self.makeBegin(data)
+			self.actType = self.getInt()
+			self.buf = self.getStr()
 		except base.protocolException,e:
 			logging.error("doAction err,msg="+e.msg)
 			return False
 		return True
 
-class ReqQuit:
-	msg_len = 0
+class ReqQuit(base.protocolBase):
 	msg = ""
 	
 	def make(self,xyid,packlen,data):
 		try:
-			nowindex,self.msg_len	= base.getInt(data,0)
-			nowindex,self.msg		= base,getStr(data,nowindex,self.msg_len)
+			self.makeBegin(data)
+			self.msg = self.getStr()
 		except base.protocolException,e:
 			logging.error("doQuit err,msg="+e.msg)
 			return False
 		return True
 	
 	def pack(self,msg):
-		data	= base.getPackStr("ii",XYID_REQQUIT,0)
-		data	= data + base.getPackStr("i",len(msg))
-		data	= data + base.getPackStr(str(len(msg))+"s",msg)
-		return data
+		self.packBegin(XYID_REQQUIT)
+		self.packStr(msg)
+		return self.packEnd()
 
-class ReqDefault:
+class ReqDefault(base.protocolBase):
 	num = 0
 	
 	def make(self,xyid,packlen,data):
 		try:
-			nowindex,self.num	= base.getInt(data,0)
+			self.makeBegin(data)
+			self.num = self.getInt()
 		except base.protocolException,e:
 			logging.error("doDefault err,msg="+e.msg)
 			return False
 		return True
 		
-class ReportPlayerData:
+class ReportPlayerData(base.protocolBase):
 	numid = 0
 	
 	def pack(self,numid):
-		data	= base.getPackStr("ii",XYID_PLAYERDATA,0)
-		data	= data + base.getPackStr("i",numid)
-		return data
+		self.packBegin(XYID_PLAYERDATA)
+		self.packInt(numid)
+		return self.packEnd()
 
-class ReqPlayerPosition:
-	x = 0
-	y = 0
-	z = 0
 
-	def make(self, xyid, packlen, data):
-		try:
-			nowindex, self.x= base.getFloat(data, 0)
-			nowindex, self.y= base.getFloat(data, nowindex)
-			nowindex, self.z= base.getFloat(data, nowindex)
-		except base.protocolException, e:
-			logging.error("doQuit err,msg=" + e.msg)
-			return False
-		return True
-
-	def pack(self, numid, x, y, z):
-		data = base.getPackStr("ii", XYID_PLAYERPOSITION, 0)
-		data = data + base.getPackStr("i", len(x))
-		data = data + base.getPackStr("i", len(y))
-		data = data + base.getPackStr("i", len(z))
-		return data
 
 
 

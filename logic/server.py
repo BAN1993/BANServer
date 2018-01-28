@@ -35,7 +35,7 @@ class Server(object):
 		self.m_server.setblocking(False)
 		self.m_server.settimeout(self.m_timeout)
 		self.m_server.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1) #keepalive
-		self.m_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #¶Ë¿Ú¸´ÓÃ
+		self.m_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #ï¿½Ë¿Ú¸ï¿½ï¿½ï¿½
 		try:
 			server_host = (self.m_host, self.m_port)
 			self.m_server.bind(server_host)
@@ -63,7 +63,7 @@ class Server(object):
 					data = ""
 					try:
 						data = s.recv(self.m_maxBufLen)
-						logging.debug("recv data="+base.getBytes(data))
+						#logging.debug("recv data="+base.getBytes(data))
 					except socket.error, msg:
 						logging.error('Recv Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
 					if data:
