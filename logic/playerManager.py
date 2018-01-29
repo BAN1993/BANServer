@@ -32,12 +32,12 @@ def findPlayerByConn(conn):
 	return False
 		
 def delPlayerByConn(conn):
-	player = findPlayerByConn(conn)
-	if player == False:
+	tmpPlayer = findPlayerByConn(conn)
+	if not tmpPlayer:
 		#raise Exception("Can not find player:conn="+str(conn))
 		logging.warning("Can not find player:conn="+str(conn))
 		return
-	delPlayer(player)
+	delPlayer(tmpPlayer)
 		
 def findPlayer(numid):
 	if playerList.has_key(numid):

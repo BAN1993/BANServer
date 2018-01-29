@@ -1,8 +1,6 @@
 import os
 import logging
 import logging.config
-import time
-from thread import *
 
 def initLog(fname):
 	if os.path.exists('log'):

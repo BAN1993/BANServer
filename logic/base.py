@@ -12,7 +12,7 @@ class protocolBase(object):
 	bs_buf = ""
 
 	def __init__(self):
-		self.bs_nowindex = 0;
+		self.bs_nowindex = 0
 		self.bs_buf = ""
 
 	#------------------------------------------------------------------------------------------------------------------------
@@ -43,9 +43,9 @@ class protocolBase(object):
 	def packInt(self,num):
 		self.bs_buf = self.bs_buf + struct.pack("i", num)
 
-	def packStr(self,str):
-		strlen = len(str)
-		self.bs_buf = self.bs_buf + struct.pack("i"+str(strlen)+"s",strlen,str)
+	def packStr(self,src):
+		strlen = len(src)
+		self.bs_buf = self.bs_buf + struct.pack("i"+str(strlen)+"s",strlen,src)
 
 	def packEnd(self):
 		return self.bs_buf

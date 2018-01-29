@@ -70,7 +70,7 @@ class Server(object):
 						ret,xyid,packlen = base.getHand(data)
 						if ret == True:
 							logging.debug("len="+str(packlen)+",by="+base.getBytes(data[0:packlen]))
-							selectProtocol.getXY(s,xyid,packlen,data[0:packlen])
+							selectProtocol.getXY(s,xyid,data[0:packlen])
 						#else:
 							#logging.error("can not getHand,data="+base.getBytes(data))
 					else:

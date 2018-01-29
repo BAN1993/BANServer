@@ -14,9 +14,9 @@ class ReqLogin(base.protocolBase):
 	numid = 0
 	password = ""
 	
-	def make(self,xyid,packlen,data):
+	def make(self,data):
 		try:
-			self.makeBegin(data)
+			self.makeBegin(data[8:])
 			self.numid = self.getInt()
 			self.password = self.getStr()
 		except base.protocolException,e:
@@ -34,9 +34,9 @@ class ReqAction(base.protocolBase):
 	actType = 0
 	buf = ""
 	
-	def make(self,xyid,packlen,data):
+	def make(self,data):
 		try:
-			self.makeBegin(data)
+			self.makeBegin(data[8:])
 			self.actType = self.getInt()
 			self.buf = self.getStr()
 		except base.protocolException,e:
@@ -47,9 +47,9 @@ class ReqAction(base.protocolBase):
 class ReqQuit(base.protocolBase):
 	msg = ""
 	
-	def make(self,xyid,packlen,data):
+	def make(self,data):
 		try:
-			self.makeBegin(data)
+			self.makeBegin(data[8:])
 			self.msg = self.getStr()
 		except base.protocolException,e:
 			logging.error("doQuit err,msg="+e.msg)
@@ -64,9 +64,9 @@ class ReqQuit(base.protocolBase):
 class ReqDefault(base.protocolBase):
 	num = 0
 	
-	def make(self,xyid,packlen,data):
+	def make(self,data):
 		try:
-			self.makeBegin(data)
+			self.makeBegin(data[8:])
 			self.num = self.getInt()
 		except base.protocolException,e:
 			logging.error("doDefault err,msg="+e.msg)
