@@ -1,6 +1,6 @@
 import base
 import parseProtocol
-import serverLogic
+from serverLogic import gServerLogic
 
 def getXY(conn,xyid,data):
 
@@ -8,24 +8,24 @@ def getXY(conn,xyid,data):
 		req = parseProtocol.ReqLogin()
 		ret = req.make(data)
 		if ret:
-			serverLogic.doLogin(conn,req)
+			gServerLogic.doLogin(conn,req)
 			
 	elif xyid == parseProtocol.XYID_REQACTION:
 		req = parseProtocol.ReqAction()
 		ret = req.make(data)
 		if ret:
-			serverLogic.doAction(req)
+			gServerLogic.doAction(req)
 			
 	elif xyid == parseProtocol.XYID_REQQUIT:
 		req = parseProtocol.ReqQuit()
 		ret = req.make(data)
 		if ret:
-			serverLogic.doQuit(req)
+			gServerLogic.doQuit(req)
 			
 	else:
 		req = parseProtocol.ReqDefault()
 		ret = req.make(data)
 		if ret:
-			serverLogic.doDefault(req)
+			gServerLogic.doDefault(req)
 	
 

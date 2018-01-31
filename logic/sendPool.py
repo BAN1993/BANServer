@@ -2,33 +2,35 @@ import Queue
 import logging
 
 import player
-import playerManager
+#from playerManager import gPlayerManager
 
-msgQueus = {}
-msgOutPuts = []
+class sendPool(object):
+	msgQueus = {}
+	msgOutPuts = []
 
-def delPlayer(conn):
-	if conn in msgQueus:
-		del msgQueus[conn]
-	if conn in msgOutPuts:
-		del msgOutPuts[conn]
-	
-def push(conn, data):
-	if conn not in msgQueus:
-		msgQueus[conn] = Queue.Queue()
-	if conn not in msgOutPuts:
-		msgOutPuts.append(conn)
-		
-	msgQueus[conn].put(data)
-	
-def getOutPuts():
-	return msgOutPuts
-	
-def getMsg(conn):
-	logging.debug("addr="+str(conn.getpeername()))
-	try:
-		return msgQueus[conn].get_nowait()
-	except:
-		if conn in msgOutPuts:
-			msgOutPuts.remove(conn)
-		raise
+	def delPlayer(self, conn):
+		if conn in self.msgQueus:
+			del self.msgQueus[conn]
+		if conn in self.msgOutPuts:
+			del self.msgOutPuts[conn]
+
+	def push(self, conn, data):
+		if conn not in self.msgQueus:
+			self.msgQueus[conn] = Queue.Queue()
+		if conn not in self.msgOutPuts:
+			self.msgOutPuts.append(conn)
+		self.msgQueus[conn].put(data)
+
+	def getOutPuts(self):
+		return self.msgOutPuts
+
+	def getMsg(self, conn):
+		logging.debug("addr="+str(conn.getpeername()))
+		try:
+			return self.msgQueus[conn].get_nowait()
+		except:
+			if conn in self.msgOutPuts:
+				self.msgOutPuts.remove(conn)
+			raise
+
+gSendPool = sendPool()

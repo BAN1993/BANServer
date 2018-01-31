@@ -4,11 +4,13 @@ import socket
 import select
 import Queue
 import logging
+import threading
 
 import base
 import selectProtocol
-import sendPool
-import playerManager
+from serverLogic import gServerLogic
+from sendPool import gSendPool
+from playerManager import gPlayerManager
 
 class Server(object):
 
@@ -23,7 +25,7 @@ class Server(object):
 	m_inputs = []
 	m_outputs = []
 	m_clientList = {}
-	
+
 	def __init__(self, host, port, timeout=2, listennum=5):
 		self.m_host			= host
 		self.m_port			= port
@@ -35,20 +37,26 @@ class Server(object):
 		self.m_server.setblocking(False)
 		self.m_server.settimeout(self.m_timeout)
 		self.m_server.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1) #keepalive
-		self.m_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #�˿ڸ���
+		self.m_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #端口复用
 		try:
 			server_host = (self.m_host, self.m_port)
 			self.m_server.bind(server_host)
 			self.m_server.listen(self.m_lisenNum)
+			self.onTimer()
 			logging.info("bind success:host="+str(server_host))
 		except :
 			raise
 		self.m_inputs = [self.m_server]
 	## def __init__(self, host, port, timeout=2, listennum=5):
 
+	def onTimer(self):
+		gServerLogic.onTimer()
+		self.timer = threading.Timer(1.0, self.onTimer)
+		self.timer.start()
+
 	def run(self):
 		while True:
-			readtable, writable, exceptional = select.select(self.m_inputs, sendPool.getOutPuts(), self.m_inputs, self.m_timeout)
+			readtable, writable, exceptional = select.select(self.m_inputs, gSendPool.getOutPuts(), self.m_inputs, self.m_timeout)
 			if not (readtable or writable or exceptional) :
 				continue
 			
@@ -79,14 +87,14 @@ class Server(object):
 							self.m_inputs.remove(s)
 						s.close()
 						del self.m_clientList[s]
-						playerManager.delPlayerByConn(s)
+						gPlayerManager.delPlayerByConn(s)
 				## if s is self.m_server:
 			## for s in readtable:
 			
 			for s in writable:
 				#logging.debug("get send msg:conn="+self.m_clientList[s]+",nowsize="+str(self.m_msgQueus[s].qsize()))
 				try:
-					next_msg = sendPool.getMsg(s)
+					next_msg = gSendPool.getMsg(s)
 				except Queue.Empty:
 					logging.debug("Output Queue is Empty!conn="+self.m_clientList[s])
 					#self.m_outputs.remove(s)
@@ -98,11 +106,11 @@ class Server(object):
 						logging.debug("send data:addr=%s,databytes=%s" % (str(s.getpeername()),base.getBytes(next_msg)))
 					except Exception, e:
 						logging.error("Send Data to %s  Error And Close! ErrMsg:%s" % (str(s.getpeername()), str(e)))
-						playerManager.delPlayerByConn(s)
+						gPlayerManager.delPlayerByConn(s)
 			## for s in writable:
 			
 			for s in exceptional:
-				logging.error("Client:%s Close Error." % str(self.m_clientList[cli]))
+				logging.error("Client:%s Close Error." % str(self.m_clientList[s]))
 				if s in self.m_inputs:
 					self.m_inputs.remove(s)
 					s.close()

@@ -1,7 +1,7 @@
 #import logging
 
 import parseProtocol
-import sendPool
+from sendPool import gSendPool
 
 class Player:
 	
@@ -31,7 +31,7 @@ class Player:
 		return self.m_addr
 		
 	def senddata(self, data):
-		sendPool.push(self.m_conn, data)
+		gSendPool.push(self.m_conn, data)
 		
 	def close(self,data):
 		req = parseProtocol.ReqQuit()

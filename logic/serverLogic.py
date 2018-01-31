@@ -1,20 +1,27 @@
 import logging
 
 import player
-import playerManager
 import parseProtocol
+from playerManager import gPlayerManager
 
-def doLogin(conn,req):
-	logging.info("numid="+str(req.numid)+",password="+req.password)
-	if True == playerManager.addPlayer(conn,req.numid):
-		playerManager.broadcastPlayerData(conn,req.numid)
-		player = playerManager.findPlayer(req.numid)
+class serverLogic(object):
 
-def doAction(req):
-	logging.info("acttype=%d,buf=%s" % (req.actType,req.buf))
+	def onTimer(self):
+		logging.info("player count="+str(gPlayerManager.getPlayerCount()))
 
-def doQuit(req):
-	logging.info("1")
+	def doLogin(self, conn, req):
+		logging.info("numid="+str(req.numid)+",password="+req.password)
+		if gPlayerManager.addPlayer(conn,req.numid):
+			gPlayerManager.broadcastPlayerData(conn,req.numid)
+			#player = gPlayerManager.findPlayer(req.numid)
 
-def doDefault(req):
-	logging.info("1")
+	def doAction(self, req):
+		logging.info("acttype=%d,buf=%s" % (req.actType,req.buf))
+
+	def doQuit(self, req):
+		logging.info("1")
+
+	def doDefault(self, req):
+		logging.info("1")
+
+gServerLogic = serverLogic()
