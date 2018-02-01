@@ -47,8 +47,8 @@ class playerManager(object):
 			return False
 
 	def broadcast(self,data):
-		for player in self.playerList.values:
-			player.senddata(data)
+		for key in self.playerList:
+			self.playerList[key].senddata(data)
 
 	def broadcastPlayerData(self,conn,numid):
 		logging.debug("numid="+str(numid))

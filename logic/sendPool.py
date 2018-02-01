@@ -10,9 +10,12 @@ class sendPool(object):
 
 	def delPlayer(self, conn):
 		if conn in self.msgQueus:
+			logging.debug("msgQueus:conn="+str(conn))
 			del self.msgQueus[conn]
 		if conn in self.msgOutPuts:
-			del self.msgOutPuts[conn]
+			logging.debug("msgOutPuts:conn="+str(conn))
+			index = self.msgOutPuts.index(conn)
+			del self.msgOutPuts[index]
 
 	def push(self, conn, data):
 		if conn not in self.msgQueus:

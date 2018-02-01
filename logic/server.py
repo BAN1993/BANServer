@@ -77,7 +77,7 @@ class Server(object):
 					if data:
 						ret,xyid,packlen = base.getHand(data)
 						if ret == True:
-							logging.debug("len="+str(packlen)+",by="+base.getBytes(data[0:packlen]))
+							#logging.debug("len="+str(packlen)+",by="+base.getBytes(data[0:packlen]))
 							selectProtocol.getXY(s,xyid,data[0:packlen])
 						#else:
 							#logging.error("can not getHand,data="+base.getBytes(data))
@@ -103,7 +103,7 @@ class Server(object):
 				else:
 					try:
 						s.sendall(next_msg)
-						logging.debug("send data:addr=%s,databytes=%s" % (str(s.getpeername()),base.getBytes(next_msg)))
+						#logging.debug("send data:addr=%s,databytes=%s" % (str(s.getpeername()),base.getBytes(next_msg)))
 					except Exception, e:
 						logging.error("Send Data to %s  Error And Close! ErrMsg:%s" % (str(s.getpeername()), str(e)))
 						gPlayerManager.delPlayerByConn(s)

@@ -44,6 +44,12 @@ class ReqAction(base.protocolBase):
 			return False
 		return True
 
+	def pack(self, acttype, buf):
+		self.packBegin(XYID_REQACTION)
+		self.packInt(acttype)
+		self.packStr(buf)
+		return self.packEnd()
+
 class ReqQuit(base.protocolBase):
 	msg = ""
 	

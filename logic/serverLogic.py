@@ -8,6 +8,9 @@ class serverLogic(object):
 
 	def onTimer(self):
 		logging.info("player count="+str(gPlayerManager.getPlayerCount()))
+		req = parseProtocol.ReqAction()
+		data = req.pack(1,"abc")
+		gPlayerManager.broadcast(data)
 
 	def doLogin(self, conn, req):
 		logging.info("numid="+str(req.numid)+",password="+req.password)
