@@ -27,6 +27,7 @@ class Server(object):
 	m_clientList = {}
 
 	def __init__(self, host, port, timeout=2, listennum=5):
+		logging.info("host=%s,post=%d,timeout=%d,listennum=%d" % (host,port,timeout,listennum))
 		self.m_host			= host
 		self.m_port			= port
 		self.m_timeout		= timeout
@@ -100,12 +101,13 @@ class Server(object):
 					#self.m_outputs.remove(s)
 				except Exception, e:
 					logging.error("Send Data Error! ErrMsg:%s" % str(e))
+					gPlayerManager.delPlayerByConn(s)
 				else:
 					try:
 						s.sendall(next_msg)
-						#logging.debug("send data:addr=%s,databytes=%s" % (str(s.getpeername()),base.getBytes(next_msg)))
+						logging.debug("send data:addr=%s,databytes=%s" % (str(s.getpeername()),base.getBytes(next_msg)))
 					except Exception, e:
-						logging.error("Send Data to %s  Error And Close! ErrMsg:%s" % (str(s.getpeername()), str(e)))
+						logging.error("Send Data Error And Close! ErrMsg:%s" % str(e))
 						gPlayerManager.delPlayerByConn(s)
 			## for s in writable:
 			

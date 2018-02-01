@@ -4,4 +4,4 @@ kill $pid
 sleep 1
 python main.py
 sleep 0.5
-tail -f ./log/*
+tail -f ./log/* # | grep -E "senddata|send data"
