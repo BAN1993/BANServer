@@ -1,4 +1,4 @@
-import logging
+#import logging
 
 import parseProtocol
 from sendPool import gSendPool
@@ -31,7 +31,6 @@ class Player:
 		return self.m_addr
 		
 	def senddata(self, data):
-		logging.info("numid="+str(self.m_numid)+",data="+data)
 		gSendPool.push(self.m_conn, data)
 		
 	def close(self,data):

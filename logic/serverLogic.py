@@ -12,6 +12,8 @@ class serverLogic(object):
 		data = req.pack(1,"abc")
 		gPlayerManager.broadcast(data)
 
+	## def onTimer(self):
+
 	def doLogin(self, conn, req):
 		logging.info("numid="+str(req.numid)+",password="+req.password)
 		if gPlayerManager.addPlayer(conn,req.numid):

@@ -11,6 +11,7 @@ import selectProtocol
 from serverLogic import gServerLogic
 from sendPool import gSendPool
 from playerManager import gPlayerManager
+from dbManager import gDBManager
 
 class Server(object):
 
@@ -27,7 +28,6 @@ class Server(object):
 	m_clientList = {}
 
 	def __init__(self, host, port, timeout=2, listennum=5):
-		logging.info("host=%s,post=%d,timeout=%d,listennum=%d" % (host,port,timeout,listennum))
 		self.m_host			= host
 		self.m_port			= port
 		self.m_timeout		= timeout
@@ -43,19 +43,33 @@ class Server(object):
 			server_host = (self.m_host, self.m_port)
 			self.m_server.bind(server_host)
 			self.m_server.listen(self.m_lisenNum)
-			self.onTimer()
 			logging.info("bind success:host="+str(server_host))
 		except :
 			raise
 		self.m_inputs = [self.m_server]
+
+		try:
+			gDBManager.mConnect("127.0.0.1", 3306, 'root', '123456', 'py_test')
+		except:
+			raise
+
 	## def __init__(self, host, port, timeout=2, listennum=5):
 
 	def onTimer(self):
 		gServerLogic.onTimer()
+		gDBManager.onTimer()
+
+		bo, row, ret = gDBManager.select("select * from players")
+		logging.debug("row=%d" % row)
+		if bo :
+			for k in ret:
+				logging.debug(str(k[0])+":"+str(k[1])+":"+str(k[2]))
+
 		self.timer = threading.Timer(1.0, self.onTimer)
 		self.timer.start()
 
 	def run(self):
+		self.onTimer()
 		while True:
 			readtable, writable, exceptional = select.select(self.m_inputs, gSendPool.getOutPuts(), self.m_inputs, self.m_timeout)
 			if not (readtable or writable or exceptional) :
@@ -101,13 +115,12 @@ class Server(object):
 					#self.m_outputs.remove(s)
 				except Exception, e:
 					logging.error("Send Data Error! ErrMsg:%s" % str(e))
-					gPlayerManager.delPlayerByConn(s)
 				else:
 					try:
 						s.sendall(next_msg)
-						logging.debug("send data:addr=%s,databytes=%s" % (str(s.getpeername()),base.getBytes(next_msg)))
+						#logging.debug("send data:addr=%s,databytes=%s" % (str(s.getpeername()),base.getBytes(next_msg)))
 					except Exception, e:
-						logging.error("Send Data Error And Close! ErrMsg:%s" % str(e))
+						logging.error("Send Data to %s  Error And Close! ErrMsg:%s" % (str(s.getpeername()), str(e)))
 						gPlayerManager.delPlayerByConn(s)
 			## for s in writable:
 			
