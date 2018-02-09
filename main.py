@@ -2,6 +2,7 @@
 
 import sys
 import logging
+import ConfigParser
 
 sys
 sys.path.append("logic")
@@ -20,7 +21,9 @@ if __name__ == '__main__':
 	deamon.daemonize()
 
 	try:
-		svr = server.Server(HOST,PORT)
+		conf = ConfigParser.ConfigParser()
+		conf.read('config.ini')
+		svr = server.Server(conf)
 		svr.run()
 	except BaseException as e:
 		logging.exception(e)

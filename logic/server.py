@@ -18,7 +18,7 @@ class Server(object):
 	m_host = ''
 	m_port = 0
 	m_timeout = 2
-	m_lisenNum = 5
+	m_listenNum = 5
 	m_maxBufLen = 1024
 	
 	m_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -27,13 +27,14 @@ class Server(object):
 	m_outputs = []
 	m_clientList = {}
 
-	def __init__(self, host, port, timeout=2, listennum=5):
-		self.m_host			= host
-		self.m_port			= port
-		self.m_timeout		= timeout
-		self.m_lisenNum		= listennum
-		self.m_maxBufLen	= 1024
-		
+	def __init__(self, conf):
+		self.m_host			= str(conf.get("serverConfig", "host"))
+		self.m_port			= int(conf.get("serverConfig", "port"))
+		self.m_timeout		= int(conf.get("serverConfig", "timeout"))
+		self.m_listenNum	= int(conf.get("serverConfig", "listennum"))
+		self.m_maxBufLen	= int(conf.get("serverConfig", "maxbuflen"))
+
+		logging.info("host=%s,port=%d,timeout=%d,listennum=%d,maxbuflen=%d" % (self.m_host, self.m_port, self.m_timeout, self.m_listenNum, self.m_maxBufLen))
 		self.m_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.m_server.setblocking(False)
 		self.m_server.settimeout(self.m_timeout)
@@ -42,14 +43,14 @@ class Server(object):
 		try:
 			server_host = (self.m_host, self.m_port)
 			self.m_server.bind(server_host)
-			self.m_server.listen(self.m_lisenNum)
+			self.m_server.listen(self.m_listenNum)
 			logging.info("bind success:host="+str(server_host))
 		except :
 			raise
 		self.m_inputs = [self.m_server]
 
 		try:
-			gDBManager.mConnect("127.0.0.1", 3306, 'root', '123456', 'py_test')
+			gDBManager.mConnect(conf)
 		except:
 			raise
 
