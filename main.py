@@ -4,25 +4,19 @@ import sys
 import logging
 import ConfigParser
 
-sys
 sys.path.append("logic")
 import deamon
 import server
 import log
 
-HOST = ''
-PORT = 8300
-
 if __name__ == '__main__':
 
 	log.initLog("logging.conf")
-	logging.info("server start!!!")
-
+	conf = ConfigParser.ConfigParser()
+	conf.read('config.ini')
 	deamon.daemonize()
 
 	try:
-		conf = ConfigParser.ConfigParser()
-		conf.read('config.ini')
 		svr = server.Server(conf)
 		svr.run()
 	except BaseException as e:
