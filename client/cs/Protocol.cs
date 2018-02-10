@@ -11,11 +11,12 @@ namespace SocketClient
     enum HANDTYPE
     {
         PACK_TYPE = 0,
-        PACK_TYPE_LOGIN,
-        PACK_TYPE_ACTION,
-        PACK_TYPE_QUIT,
-        PACK_TYPE_DEFAULT,
-        PACK_TYPE_PLAYERDATA
+        REQ_LOGIN,
+        RESP_LOGIN,
+        REQ_REGISTER,
+        RESP_REGISTER,
+        REQ_QUIT,
+        REPORT_PLAYERDATA
     }
 
     public class ProtocolBase
@@ -170,15 +171,17 @@ namespace SocketClient
         }
     }
 
-    public class pack_login : ProtocolBase
+    public class reqLogin : ProtocolBase
     {
         public int numid;
+        public string userid;
         public string password;
 
-        public pack_login(int numid, string password)
+        public reqLogin(int numid, string userid,string password)
         {
-            this.type = (int)HANDTYPE.PACK_TYPE_LOGIN;
+            this.type = (int)HANDTYPE.REQ_LOGIN;
             this.numid = numid;
+            this.userid = userid;
             this.password = password;
         }
 
@@ -187,6 +190,7 @@ namespace SocketClient
             makeBegin(buf);
 
             this.numid = getInt();
+            this.userid = getString();
             this.password = getString();
         }
 
@@ -195,13 +199,129 @@ namespace SocketClient
             packBegin();
 
             packInt(this.numid);
+            packString(this.userid);
             packString(this.password);
 
             return packEnd();
         }
     }
 
-    public class pack_playerdata : ProtocolBase
+    public class respLogin : ProtocolBase
+    {
+        enum FLAG
+        {
+            SUCCESS = 0,
+            NOUSER = 1,
+            PWDERR = 2,
+            DBERR = 3,
+        }
+
+        public int flag;
+        public int numid;
+
+        public respLogin()
+        {
+            this.type = (int)HANDTYPE.RESP_LOGIN;
+            this.flag = (int)respLogin.FLAG.SUCCESS;
+            this.numid = 0;
+        }
+
+        public respLogin(int flag, int numid)
+        {
+            this.type = (int)HANDTYPE.RESP_LOGIN;
+            this.flag = flag;
+            this.numid = numid;
+        }
+
+        public void make(byte[] buf)
+        {
+            makeBegin(buf);
+
+            this.flag = getInt();
+            this.numid = getInt();
+        }
+
+        public byte[] pack()
+        {
+            packBegin();
+
+            packInt(this.flag);
+            packInt(this.numid);
+
+            return packEnd();
+        }
+    }
+
+    public class reqRegister : ProtocolBase
+    {
+        public string userid;
+        public string password;
+
+        public reqRegister(string userid,string password)
+        {
+            this.type = (int)HANDTYPE.REQ_REGISTER;
+            this.userid = userid;
+            this.password = password;
+        }
+
+        public void make(byte[] buf)
+        {
+            makeBegin(buf);
+
+            this.userid = getString();
+            this.password = getString();
+        }
+
+        public byte[] pack()
+        {
+            packBegin();
+
+            packString(this.userid);
+            packString(this.password);
+            return packEnd();
+        }
+    }
+
+    public class respRegister : ProtocolBase
+    {
+        enum FLAG
+        {
+            SUCCESS = 0,
+            USED_USERID = 1,
+            DBERR = 2,
+            CREATEERR = 3,
+        }
+
+        public int flag;
+        public int numid;
+
+        public respRegister()
+        {
+            this.type = (int)HANDTYPE.RESP_REGISTER;
+            this.flag = (int)respRegister.FLAG.SUCCESS;
+            this.numid = 0;
+        }
+
+        public void make(byte[] buf)
+        {
+            makeBegin(buf);
+
+            this.flag = getInt();
+            this.numid = getInt();
+        }
+
+        public byte[] pack()
+        {
+            packBegin();
+
+            packInt(this.flag);
+            packInt(this.numid);
+
+            return packEnd();
+        }
+    }
+
+    public class reportPlayerdata : ProtocolBase
     {
         public int numid;
 
