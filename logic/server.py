@@ -56,12 +56,6 @@ class Server(object):
 		gServerLogic.onTimer()
 		gDBManager.onTimer()
 
-		bo, row, ret = gDBManager.select("select * from players")
-		logging.debug("row=%d" % row)
-		if bo :
-			for k in ret:
-				logging.debug(str(k[0])+":"+str(k[1])+":"+str(k[2]))
-
 		self.m_timer = threading.Timer(1.0, self.onTimer)
 		self.m_timer.start()
 

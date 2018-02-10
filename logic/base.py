@@ -51,6 +51,9 @@ class protocolBase(object):
 		return self.bs_buf
 
 
+def getEnum(**enums):
+	return type('Enum', (), enums)
+
 def getBytes(data):
 	return ' '.join(['0x%x' % ord(x) for x in data])
 
