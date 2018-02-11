@@ -24,8 +24,10 @@ class serverLogic(object):
 		ret, row, rslt = gDBManager.select(sql)
 		if not ret:
 			resp.flag = resp.FLAG.DBERR
+			logging.error("select ret err,sql=%s" % sql)
 		elif row <= 0:
 			resp.flag = resp.FLAG.NOUSER
+			logging.info("numid=%d,userid=%s select no data" % (req.numid, req.userid))
 		else:
 			if str(rslt[0][1]) == req.password :
 				resp.numid = int(rslt[0][0])
@@ -33,6 +35,7 @@ class serverLogic(object):
 					gPlayerManager.broadcastPlayerData(conn, req.numid)
 			else:
 				resp.flag = resp.FLAG.PWDERR
+				logging.info("numid=%d,userid=%s pwd err" % (req.numid, req.userid))
 
 		logging.info("numid=%d,userid=%s,flag=%d" % (resp.numid,req.userid,resp.flag))
 		data = resp.pack()
@@ -50,8 +53,10 @@ class serverLogic(object):
 		ret, row, rslt = gDBManager.select(sql)
 		if not ret:
 			resp.flag = resp.FLAG.DBERR
+			logging.error("select ret err,sql=%s" % sql)
 		elif row>0:
 			resp.flag = resp.FLAG.USED_USERID
+			logging.info("userid=%s had been used" % req.userid)
 		else:
 
 			#插入这条账号数据
@@ -59,6 +64,7 @@ class serverLogic(object):
 			ret, row, rslt = gDBManager.querry(sql)
 			if not ret:
 				resp.flag = resp.FLAG.DBERR
+				logging.error("insert ret err,sql=%s" % sql)
 			elif row>0:
 
 				#查询这个账号id的数字id
@@ -66,19 +72,22 @@ class serverLogic(object):
 				ret, row, rslt = gDBManager.select(sql)
 				if not req:
 					resp.flag = resp.FLAG.DBERR
+					logging.error("select ret err,sql=%s" % sql)
 				elif row<=0:
 					resp.flag = resp.FLAG.CREATEERR
+					logging.warning("insert success,bug select row<=0,userid=%s" % req.userid)
 				else:
 					resp.numid = int(rslt[0][0])
 			else:
 				resp.flag = resp.FLAG.CREATEERR
+				logging.warning("insert row <=0,sql=%s" % sql)
 
 		logging.info("userid=%s,numid=%d,flag=%d" % (req.userid,resp.numid,resp.flag))
 		data = resp.pack()
 		gSendPool.push(conn, data)
 
 	def doQuit(self, req):
-		logging.info("1")
+		logging.info("req=%s" % str(req))
 
 
 gServerLogic = serverLogic()

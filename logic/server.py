@@ -12,6 +12,7 @@ from serverLogic import gServerLogic
 from sendPool import gSendPool
 from playerManager import gPlayerManager
 from dbManager import gDBManager
+from cryptManager import gCrypt
 
 class Server(object):
 
@@ -48,6 +49,7 @@ class Server(object):
 		logging.info("bind success:host="+str(server_host))
 		self.m_inputs = [self.m_server]
 
+		gCrypt.init(conf)
 		gDBManager.mConnect(conf)
 
 	## def __init__(self, host, port, timeout=2, listennum=5):
@@ -80,7 +82,7 @@ class Server(object):
 						data = s.recv(self.m_maxBufLen)
 						#logging.debug("recv data="+base.getBytes(data))
 					except socket.error, msg:
-						logging.error('Recv Error Code : ' + str(msg))
+						logging.error('Recv Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
 					if data:
 						ret,xyid,packlen = base.getHand(data)
 						if ret:
