@@ -31,7 +31,7 @@ class serverLogic(object):
 		else:
 			if str(rslt[0][1]) == req.password :
 				resp.numid = int(rslt[0][0])
-				if gPlayerManager.addPlayer(conn, req.numid):
+				if gPlayerManager.addPlayer(conn, resp.numid):
 					gPlayerManager.broadcastPlayerData(conn, req.numid)
 			else:
 				resp.flag = resp.FLAG.PWDERR

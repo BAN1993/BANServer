@@ -79,17 +79,20 @@ class Server(object):
 				else:
 					data = ""
 					try:
-						data = s.recv(self.m_maxBufLen)
+						buf = s.recv(self.m_maxBufLen)
+						data = gCrypt.decryptAES(buf)
 						#logging.debug("recv data="+base.getBytes(data))
 					except socket.error, msg:
-						logging.error('Recv Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
+						logging.error("SocketError Code=" + str(msg[0]) + ",Msg=" + msg[1])
+					except base.cryptException, msg:
+						logging.error("CryptError msg=" + str(msg))
 					if data:
 						ret,xyid,packlen = base.getHand(data)
 						if ret:
 							#logging.debug("len="+str(packlen)+",by="+base.getBytes(data[0:packlen]))
 							selectProtocol.getXY(s,xyid,data[0:packlen])
-						#else:
-							#logging.error("can not getHand,data="+base.getBytes(data))
+						else:
+							logging.error("can not getHand,data="+base.getBytes(data))
 					else:
 						logging.info("client colse:"+str(s)+",addr="+str(self.m_clientList[s]))
 						if s in self.m_inputs:
@@ -104,6 +107,7 @@ class Server(object):
 				#logging.debug("get send msg:conn="+self.m_clientList[s]+",nowsize="+str(self.m_msgQueus[s].qsize()))
 				try:
 					next_msg = gSendPool.getMsg(s)
+					data = gCrypt.encryptAES(next_msg)
 				except Queue.Empty:
 					logging.debug("Output Queue is Empty!conn="+self.m_clientList[s])
 					#self.m_outputs.remove(s)
@@ -111,8 +115,9 @@ class Server(object):
 					logging.error("Send Data Error! ErrMsg:%s" % str(e))
 				else:
 					try:
-						s.sendall(next_msg)
-						#logging.debug("send data:addr=%s,databytes=%s" % (str(s.getpeername()),base.getBytes(next_msg)))
+						s.sendall(data)
+						print base.getBytes(next_msg)
+						logging.debug("send data:addr=%s,data=%s" % (str(s.getpeername()),data))
 					except Exception, e:
 						logging.error("Send Data to %s  Error And Close! ErrMsg:%s" % (str(s.getpeername()), str(e)))
 						gPlayerManager.delPlayerByConn(s)
