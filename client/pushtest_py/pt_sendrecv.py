@@ -25,9 +25,11 @@ if __name__ == '__main__':
     for i in range(begin,end):
         req.userid = "test%d" % i
         buf = req.pack()
+        begin = base.getMSTime()
         sock.send(buf)
         recvBuf = sock.recv(1024)
         ret, xyid, packlen, buf = base.getXYHand(recvBuf)
         resp = parseProtocol.RespRegister()
         resp.make(buf[0:packlen])
-        print "flag=%d,numid=%d" % (resp.flag, resp.numid)
+        end = base.getMSTime()
+        print "flag=%d,numid=%d,slowtime=%d" % (resp.flag, resp.numid,end-begin)
