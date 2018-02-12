@@ -73,10 +73,13 @@ class DBManager(object):
         try:
             tmpCursor = self.dbConn.cursor()
             row = tmpCursor.execute(sqlstr)
+            self.dbConn.commit()
             result = tmpCursor.fetchall()
+            tmpCursor.close()
             return True, row, result
         except BaseException as e:
             logging.exception(e)
+            tmpCursor.close()
             return False, 0, []
     ## def select(self, sqlstr = ''):
 
@@ -89,9 +92,11 @@ class DBManager(object):
             row = tmpCursor.execute(sqlstr)
             self.dbConn.commit()
             result = tmpCursor.fetchall()
+            tmpCursor.close()
             return True, row, result
         except BaseException as e:
             self.dbConn.rollback()
+            tmpCursor.close()
             logging.exception(e)
             return False, 0, []
     ## def querry(self, sqlstr = ''):
