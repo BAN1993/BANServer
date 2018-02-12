@@ -24,7 +24,6 @@ class cryptManager(object):
         self.m_AES_key = str(key)
         self.m_AES_hadKey = True
 
-    # 加密函数，如果text不是16的倍数【加密文本text必须为16的倍数！】，那就补足为16的倍数
     def encryptAES(self, buf):
         if not self.m_AES_hadKey or not self.m_AES_key:
             raise base.cryptException("Key is None")
@@ -43,21 +42,15 @@ class cryptManager(object):
         text = text + ('\0' * add)
 
         ciphertext = cryptor.encrypt(text)
-        testtmp1 =ciphertext
-        testlen1 = len(testtmp1)
         # 因为AES加密时候得到的字符串不一定是ascii字符集的，输出到终端或者保存时候可能存在问题
         # 所以这里统一把加密后的字符串转化为16进制字符串
-        testtmp = b2a_hex(ciphertext)
-        testlen = len(testtmp)
         return b2a_hex(ciphertext)
 
-    # 解密后，去掉补足的空格用strip() 去掉
     def decryptAES(self, text):
         if not self.m_AES_hadKey or not self.m_AES_key:
             raise base.cryptException("Key is None")
+
         cryptor = AES.new(self.m_AES_key, self.m_AES_mode, self.m_AES_key)
-        testtmp = a2b_hex(text)
-        testlen = len(testtmp)
         plain_text = cryptor.decrypt(a2b_hex(text))
         plain_text.rstrip('\0')
         buf = base64.b64decode(plain_text)

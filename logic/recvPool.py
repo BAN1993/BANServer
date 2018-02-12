@@ -26,11 +26,11 @@ class recvPool(object):
             return False
         if packlen+base.LEN_INT > len(self.recvBuf[conn]):
             return False
-        data = self.recvBuf[conn][0:packlen+base.LEN_INT]
-        self.recvBuf[conn] = self.recvBuf[conn][packlen+base.LEN_INT:]
+        data = self.recvBuf[conn][0 : packlen + base.LEN_INT]
+        self.recvBuf[conn] = self.recvBuf[conn][packlen + base.LEN_INT:]
         ret, xyid, packlen, buf = base.getXYHand(data)
         if ret:
-            selectProtocol.getXY(conn, xyid, buf[0:packlen])
+            selectProtocol.getXY(conn, xyid, buf[0 : packlen])
         else:
             return False
         return True

@@ -9,7 +9,7 @@ class sendPool(object):
 	msgOutPuts = []
 
 	def delPlayer(self, conn):
-		logging.debug("conn="+str(conn))
+		logging.debug("conn=" + str(conn))
 		if conn in self.msgQueus:
 			del self.msgQueus[conn]
 		if conn in self.msgOutPuts:
@@ -26,7 +26,6 @@ class sendPool(object):
 		return self.msgOutPuts
 
 	def getMsg(self, conn):
-		#logging.debug("addr="+str(conn.getpeername()))
 		try:
 			return self.msgQueus[conn].get_nowait()
 		except:

@@ -6,8 +6,8 @@ import Queue
 import logging
 import threading
 
-import base
-import selectProtocol
+#import base
+#import selectProtocol
 from serverLogic import gServerLogic
 from sendPool import gSendPool
 from recvPool import gRecvPool
@@ -47,7 +47,7 @@ class Server(object):
 		server_host = (self.m_host, self.m_port)
 		self.m_server.bind(server_host)
 		self.m_server.listen(self.m_listenNum)
-		logging.info("bind success:host="+str(server_host))
+		logging.info("bind success:host=" + str(server_host))
 		self.m_inputs = [self.m_server]
 
 		gCrypt.init(conf)
@@ -73,30 +73,21 @@ class Server(object):
 			for s in readtable:
 				if s is self.m_server:
 					conn, addr = s.accept()
-					logging.info("accept:"+str(conn)+",addr="+str(addr))
+					logging.info("accept=%s,addr=%s" % (str(conn), str(addr)))
 					conn.setblocking(0)
 					self.m_inputs.append(conn)
-					self.m_clientList[conn]=str(addr)
+					self.m_clientList[conn] = str(addr)
 				else:
 					data = ""
 					try:
 						data = s.recv(self.m_maxBufLen)
-						#data = gCrypt.decryptAES(buf) -- 放到base里面自己解密，对外部透明
-						logging.debug("recv data="+data)
+						logging.debug("recv data=" + data)
 					except socket.error, msg:
-						logging.error("SocketError Code=" + str(msg[0]) + ",Msg=" + msg[1])
-
+						logging.error("SocketError Code=" + str(msg))
 					if data:
-
 						gRecvPool.push(s,data)
-						#ret,xyid,packlen,buf = base.getXYHand(data)
-						#if ret:
-						#	#logging.debug("len="+str(packlen)+",by="+base.getBytes(data[0:packlen]))
-						#	selectProtocol.getXY(s,xyid,buf[0:packlen])
-						#else:
-						#	logging.error("can not getHand,data="+base.getBytes(data))
 					else:
-						logging.info("client colse:"+str(s)+",addr="+str(self.m_clientList[s]))
+						logging.info("client close=%s,addr=%s" % (str(s), str(self.m_clientList[s])))
 						if s in self.m_inputs:
 							self.m_inputs.remove(s)
 						s.close()
@@ -106,13 +97,10 @@ class Server(object):
 			## for s in readtable:
 			
 			for s in writable:
-				#logging.debug("get send msg:conn="+self.m_clientList[s]+",nowsize="+str(self.m_msgQueus[s].qsize()))
 				try:
 					next_msg = gSendPool.getMsg(s)
-					#data = gCrypt.encryptAES(next_msg) -- 放到base里面自己加密，对外部透明
 				except Queue.Empty:
-					logging.debug("Output Queue is Empty!conn="+self.m_clientList[s])
-					#self.m_outputs.remove(s)
+					logging.debug("Output Queue is Empty!conn=" + self.m_clientList[s])
 				except Exception, e:
 					logging.error("Send Data Error! ErrMsg:%s" % str(e))
 				else:

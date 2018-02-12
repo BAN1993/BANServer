@@ -16,14 +16,14 @@ class ReqLogin(base.protocolBase):
 	userid = ""
 	password = ""
 	
-	def make(self,data):
+	def make(self, data):
 		try:
 			self.makeBegin(data[8:])
 			self.numid = self.getInt()
 			self.userid = self.getStr()
 			self.password = self.getStr()
 		except base.protocolException,e:
-			logging.error("ReqLogin err,msg="+e.msg )
+			logging.error("ReqLogin err,msg=" + e.msg)
 			return False
 		return True
 		
@@ -35,17 +35,20 @@ class ReqLogin(base.protocolBase):
 		return self.packEnd()
 
 class RespLogin(base.protocolBase):
-	FLAG = base.getEnum(SUCCESS=0,NOUSER=1,PWDERR=2,DBERR=3)
+	FLAG = base.getEnum(SUCCESS=0,
+	                    NOUSER=1,
+	                    PWDERR=2,
+	                    DBERR=3)
 	flag = 0
 	numid = 0
 
-	def make(self,data):
+	def make(self, data):
 		try:
 			self.makeBegin(data[8:])
 			self.flag = self.getInt()
 			self.numid = self.getInt()
 		except base.protocolException,e:
-			logging.error("RespLogin err,msg="+e.msg)
+			logging.error("RespLogin err,msg=" + e.msg)
 			return False
 		return True
 
@@ -59,13 +62,13 @@ class ReqRegister(base.protocolBase):
 	userid = ""
 	password = ""
 
-	def make(self,data):
+	def make(self, data):
 		try:
 			self.makeBegin(data[8:])
 			self.userid = self.getStr()
 			self.password = self.getStr()
 		except base.protocolException,e:
-			logging.error("ReqRegister err,msg="+e.msg)
+			logging.error("ReqRegister err,msg=" + e.msg)
 			return False
 		return True
 
@@ -76,17 +79,20 @@ class ReqRegister(base.protocolBase):
 		return self.packEnd()
 
 class RespRegister(base.protocolBase):
-	FLAG = base.getEnum(SUCCESS=0,USED_USERID=1,DBERR=2,CREATEERR=3)
+	FLAG = base.getEnum(SUCCESS=0,
+	                    USED_USERID=1,
+	                    DBERR=2,
+	                    CREATEERR=3)
 	flag = 0
 	numid = 0
 
-	def make(self,data):
+	def make(self, data):
 		try:
 			self.makeBegin(data[8:])
 			self.flag = self.getInt()
 			self.numid = self.getInt()
 		except base.protocolException,e:
-			logging.error("RespRegister err,msg="+e.msg)
+			logging.error("RespRegister err,msg=" + e.msg)
 			return False
 		return True
 
@@ -100,12 +106,12 @@ class RespRegister(base.protocolBase):
 class ReqQuit(base.protocolBase):
 	msg = ""
 	
-	def make(self,data):
+	def make(self, data):
 		try:
 			self.makeBegin(data[8:])
 			self.msg = self.getStr()
 		except base.protocolException,e:
-			logging.error("doQuit err,msg="+e.msg)
+			logging.error("doQuit err,msg=" + e.msg)
 			return False
 		return True
 	

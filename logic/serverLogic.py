@@ -10,12 +10,12 @@ from sendPool import gSendPool
 class serverLogic(object):
 
 	def onTimer(self):
-		a=1
-		#logging.info("player count="+str(gPlayerManager.getPlayerCount()))
+		pass
+		#logging.info("player count=%d" % gPlayerManager.getPlayerCount())
 	## def onTimer(self):
 
 	def doLogin(self, conn, req):
-		logging.info("numid=%d,userid=%s,pwd=%s" % (req.numid,req.userid,req.password))
+		logging.info("numid=%d,userid=%s,pwd=%s" % (req.numid, req.userid, req.password))
 
 		resp = parseProtocol.RespLogin()
 		resp.flag = resp.FLAG.SUCCESS
@@ -37,13 +37,13 @@ class serverLogic(object):
 				resp.flag = resp.FLAG.PWDERR
 				logging.info("numid=%d,userid=%s pwd err" % (req.numid, req.userid))
 
-		logging.info("numid=%d,userid=%s,flag=%d" % (resp.numid,req.userid,resp.flag))
+		logging.info("numid=%d,userid=%s,flag=%d" % (resp.numid, req.userid, resp.flag))
 		data = resp.pack()
 		gSendPool.push(conn, data)
 	## def doLogin(self, conn, req):
 
 	def doRegister(self, conn, req):
-		logging.info("userid=%s,pwd=%s" % (req.userid,req.password))
+		logging.info("userid=%s,pwd=%s" % (req.userid, req.password))
 
 		resp = parseProtocol.RespRegister()
 		resp.flag = resp.FLAG.SUCCESS
@@ -82,7 +82,7 @@ class serverLogic(object):
 				resp.flag = resp.FLAG.CREATEERR
 				logging.warning("insert row <=0,sql=%s" % sql)
 
-		logging.info("userid=%s,numid=%d,flag=%d" % (req.userid,resp.numid,resp.flag))
+		logging.info("userid=%s,numid=%d,flag=%d" % (req.userid, resp.numid, resp.flag))
 		data = resp.pack()
 		gSendPool.push(conn, data)
 
