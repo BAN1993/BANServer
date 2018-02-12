@@ -35,5 +35,5 @@ class Player:
 		
 	def close(self,data):
 		req = parseProtocol.ReqQuit()
-		senddata = req.pack(data)
+		senddata = req.pack()
 		self.senddata(senddata)

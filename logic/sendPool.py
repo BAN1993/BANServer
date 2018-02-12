@@ -26,7 +26,7 @@ class sendPool(object):
 		return self.msgOutPuts
 
 	def getMsg(self, conn):
-		logging.debug("addr="+str(conn.getpeername()))
+		#logging.debug("addr="+str(conn.getpeername()))
 		try:
 			return self.msgQueus[conn].get_nowait()
 		except:

@@ -16,7 +16,7 @@ class DBManager(object):
     reNowCount = 0 #距离上次ping的时间
     reConnTime = 60 # 60秒自动连接一次db
 
-    def mConnect(self, conf):
+    def init(self, conf):
         try:
             self.m_ip           = str(conf.get("dbConfig", "ip"))
             self.m_port         = int(conf.get("dbConfig", "port"))
@@ -36,7 +36,7 @@ class DBManager(object):
         except BaseException as e:
             logging.exception(e)
             return False
-    ## def mConnect(self, ip, port, user, passwd, datatable):
+    ## def init(self, ip, port, user, passwd, datatable):
 
     def mPing(self):
         if not self.dbConn or not self.isConnected:

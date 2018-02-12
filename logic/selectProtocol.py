@@ -1,7 +1,12 @@
+import logging
+
 import parseProtocol
 from serverLogic import gServerLogic
+import base
 
 def getXY(conn,xyid,data):
+
+	begin = base.getMSTime()
 
 	if xyid == parseProtocol.XYID_REQLOGIN:
 		req = parseProtocol.ReqLogin()
@@ -21,5 +26,7 @@ def getXY(conn,xyid,data):
 		if ret:
 			gServerLogic.doQuit(req)
 
-	
+	end = base.getMSTime()
+	use = end - begin
+	logging.info("slowtime=%d,xyid=%d" % (use, xyid))
 
